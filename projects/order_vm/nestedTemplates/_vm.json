@@ -227,7 +227,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[if(parameters('publicIpEnabled'), variables('publicIpId'), json('null'))]"
+                                "id": "[if(parameters('publicIpEnabled'), reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpName'))), json('null'))]"
                             },
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
