@@ -216,6 +216,7 @@
             }
         },
         {
+            "condition": "[parameters('publicIpEnabled')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2021-02-01",
             "name": "[parameters('nicName')]",
@@ -227,7 +228,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[if(parameters('publicIpEnabled'), reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpName'))), json('null'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpName'))]"
                             },
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
@@ -242,6 +243,32 @@
             "dependsOn": [
                 //"[variables('virtualNetworkId')]",
                 "[if(parameters('publicIpEnabled'), variables('publicIpId'), json('null'))]",
+                "[if(parameters('networkSecurityGroupEnabled'), variables('networkSecurityGroupId'), json('null'))]"
+            ]
+        },
+        {
+            "condition": "[not(parameters('publicIpEnabled'))]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2021-02-01",
+            "name": "[parameters('nicName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[if(parameters('networkSecurityGroupEnabled'), variables('networkSecurityGroupId'), json('null'))]"
+                }
+            },
+            "dependsOn": [
                 "[if(parameters('networkSecurityGroupEnabled'), variables('networkSecurityGroupId'), json('null'))]"
             ]
         },
